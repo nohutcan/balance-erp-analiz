@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(find /var/folders -name *.png -newer /tmp -size +50k)",
+      "Bash(find /var/folders -name *.png -newer /tmp)"
+    ]
+  }
+}
