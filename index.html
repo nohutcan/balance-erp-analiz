@@ -18,9 +18,64 @@
   --txt2: #7c8db5;
   --txt3: #3d4f6e;
   --accent: #6366f1;
+  --accent-lt: #a5b4fc;
+  --ac-dim: rgba(99,102,241,.14);
+  --ac-bdr: rgba(99,102,241,.28);
+  --ac-glow: rgba(99,102,241,.35);
+  --ac-glow2: rgba(99,102,241,.5);
+  --ac-amb1: rgba(99,102,241,.16);
+  --ac-amb2: rgba(139,92,246,.10);
+  --hdr-bg: rgba(8,12,24,.88);
+  --sb-bg: rgba(8,12,24,.7);
+  --modal-bg: #0a0e1c;
   --sw: 300px;
   --hh: 68px;
 }
+
+/* ── ACCENT THEMES ── */
+[data-accent="indigo"]  { --accent:#6366f1; --accent-lt:#a5b4fc; --ac-dim:rgba(99,102,241,.14);  --ac-bdr:rgba(99,102,241,.28);  --ac-glow:rgba(99,102,241,.35);  --ac-glow2:rgba(99,102,241,.5);  --ac-amb1:rgba(99,102,241,.16);  --ac-amb2:rgba(139,92,246,.10); }
+[data-accent="violet"]  { --accent:#7c3aed; --accent-lt:#c4b5fd; --ac-dim:rgba(124,58,237,.14);  --ac-bdr:rgba(124,58,237,.28);  --ac-glow:rgba(124,58,237,.35);  --ac-glow2:rgba(124,58,237,.5);  --ac-amb1:rgba(124,58,237,.16);  --ac-amb2:rgba(167,139,250,.10); }
+[data-accent="cyan"]    { --accent:#0891b2; --accent-lt:#67e8f9; --ac-dim:rgba(8,145,178,.14);   --ac-bdr:rgba(8,145,178,.28);   --ac-glow:rgba(8,145,178,.35);   --ac-glow2:rgba(8,145,178,.5);   --ac-amb1:rgba(8,145,178,.16);   --ac-amb2:rgba(6,182,212,.10); }
+[data-accent="emerald"] { --accent:#059669; --accent-lt:#6ee7b7; --ac-dim:rgba(5,150,105,.14);   --ac-bdr:rgba(5,150,105,.28);   --ac-glow:rgba(5,150,105,.35);   --ac-glow2:rgba(5,150,105,.5);   --ac-amb1:rgba(5,150,105,.16);   --ac-amb2:rgba(16,185,129,.10); }
+[data-accent="rose"]    { --accent:#e11d48; --accent-lt:#fda4af; --ac-dim:rgba(225,29,72,.14);   --ac-bdr:rgba(225,29,72,.28);   --ac-glow:rgba(225,29,72,.35);   --ac-glow2:rgba(225,29,72,.5);   --ac-amb1:rgba(225,29,72,.16);   --ac-amb2:rgba(251,113,133,.10); }
+[data-accent="amber"]   { --accent:#d97706; --accent-lt:#fcd34d; --ac-dim:rgba(217,119,6,.14);   --ac-bdr:rgba(217,119,6,.28);   --ac-glow:rgba(217,119,6,.35);   --ac-glow2:rgba(217,119,6,.5);   --ac-amb1:rgba(217,119,6,.16);   --ac-amb2:rgba(251,191,36,.10); }
+
+/* ── LIGHT THEME ── */
+[data-theme="light"] {
+  --bg:      #f0f4ff;
+  --bg2:     #e4eaff;
+  --card:    rgba(255,255,255,.75);
+  --card2:   rgba(255,255,255,.95);
+  --border:  rgba(0,0,0,.09);
+  --border2: rgba(0,0,0,.18);
+  --txt1: #0f172a;
+  --txt2: #475569;
+  --txt3: #94a3b8;
+  --hdr-bg: rgba(240,244,255,.92);
+  --sb-bg:  rgba(228,234,255,.8);
+  --modal-bg: #ffffff;
+}
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 70% 45% at 15% -5%,  var(--ac-amb1) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 40% at 85% 105%, var(--ac-amb2) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 50% at 50% 50%,  rgba(6,182,212,.04) 0%,transparent 70%);
+}
+[data-theme="light"] .hdr { background:var(--hdr-bg); }
+[data-theme="light"] .sb  { background:var(--sb-bg); }
+[data-theme="light"] .modal { background:var(--modal-bg); box-shadow:0 20px 60px rgba(0,0,0,.15); }
+[data-theme="light"] .drawer { background:var(--modal-bg); border-left-color:var(--border); }
+[data-theme="light"] .qg { background:rgba(255,255,255,.9); }
+[data-theme="light"] .mhc { background:rgba(255,255,255,.8); }
+[data-theme="light"] .nav { background:rgba(255,255,255,.8); }
+[data-theme="light"] .wstat { background:rgba(255,255,255,.8); }
+[data-theme="light"] .w-guide { background:rgba(255,255,255,.7); }
+[data-theme="light"] .r-mc, [data-theme="light"] .r-mc2, [data-theme="light"] .r-det { background:rgba(255,255,255,.85); }
+[data-theme="light"] .sb-inp { background:rgba(255,255,255,.7); color:var(--txt1); }
+[data-theme="light"] .sb-inp::placeholder { color:var(--txt3); }
+[data-theme="light"] .a-txt textarea, [data-theme="light"] .a-note textarea, [data-theme="light"] .num-in { background:rgba(255,255,255,.7); color:var(--txt1); }
+[data-theme="light"] .hdr-pill { background:var(--ac-dim); border-color:var(--ac-bdr); }
+[data-theme="light"] .dr-card { background:rgba(255,255,255,.8); }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
@@ -40,15 +95,15 @@ body::before {
   content:'';
   position:fixed; inset:0; pointer-events:none; z-index:0;
   background:
-    radial-gradient(ellipse 70% 45% at 15% -5%,  rgba(99,102,241,.16) 0%,transparent 60%),
-    radial-gradient(ellipse 55% 40% at 85% 105%, rgba(139,92,246,.1) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 45% at 15% -5%,  var(--ac-amb1) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 40% at 85% 105%, var(--ac-amb2) 0%,transparent 60%),
     radial-gradient(ellipse 40% 50% at 50% 50%,  rgba(6,182,212,.04) 0%,transparent 70%);
 }
 
 /* ── HEADER ── */
 .hdr {
   height:var(--hh);
-  background:rgba(8,12,24,.88);
+  background:var(--hdr-bg);
   backdrop-filter:blur(24px);
   border-bottom:1px solid var(--border);
   display:flex; align-items:center; padding:0 22px; gap:18px;
@@ -90,11 +145,11 @@ body::before {
 .hbtn svg { width:14px; height:14px; flex-shrink:0; }
 .hbtn:hover { border-color:var(--border2); color:var(--txt1); background:var(--card2); }
 .hbtn.prime {
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#8b5cf6));
   border-color:transparent; color:#fff;
-  box-shadow:0 3px 14px rgba(99,102,241,.35);
+  box-shadow:0 3px 14px var(--ac-glow);
 }
-.hbtn.prime:hover { box-shadow:0 5px 20px rgba(99,102,241,.5); transform:translateY(-1px); }
+.hbtn.prime:hover { box-shadow:0 5px 20px var(--ac-glow2); transform:translateY(-1px); }
 
 /* ── LAYOUT ── */
 .layout {
@@ -133,9 +188,9 @@ body::before {
   font-family:inherit;
 }
 .sb-inp:focus {
-  border-color:rgba(99,102,241,.45);
-  background:rgba(99,102,241,.06);
-  box-shadow:0 0 0 3px rgba(99,102,241,.09);
+  border-color:var(--ac-bdr);
+  background:var(--ac-dim);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent);
 }
 .sb-inp::placeholder { color:var(--txt3); }
 .sb-inp:last-child { margin-bottom:0; }
@@ -345,8 +400,8 @@ body::before {
   border:1px solid var(--border); background:rgba(255,255,255,.025);
   color:var(--txt2); transition:all .15s;
 }
-.opt:hover { border-color:rgba(99,102,241,.38); color:#a5b4fc; background:rgba(99,102,241,.08); }
-.opt.sel  { background:rgba(99,102,241,.14); border-color:rgba(99,102,241,.45); color:#c7d2fe; font-weight:600; }
+.opt:hover { border-color:var(--ac-bdr); color:var(--accent-lt); background:var(--ac-dim); }
+.opt.sel  { background:var(--ac-dim); border-color:var(--ac-bdr); color:var(--accent-lt); font-weight:600; }
 
 .a-num { display:flex; align-items:center; gap:9px; }
 .num-in {
@@ -355,7 +410,7 @@ body::before {
   border-radius:9px; font-size:13px; font-weight:600; color:var(--txt1);
   outline:none; transition:all .16s; font-family:inherit;
 }
-.num-in:focus { border-color:rgba(99,102,241,.4); background:rgba(99,102,241,.05); box-shadow:0 0 0 3px rgba(99,102,241,.08); }
+.num-in:focus { border-color:var(--ac-bdr); background:var(--ac-dim); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent); }
 .num-unit { font-size:13px; color:var(--txt3); font-weight:500; }
 
 .a-txt textarea {
@@ -365,7 +420,7 @@ body::before {
   outline:none; resize:vertical; min-height:75px;
   font-family:inherit; line-height:1.7; transition:all .16s;
 }
-.a-txt textarea:focus { border-color:rgba(99,102,241,.38); background:rgba(99,102,241,.04); box-shadow:0 0 0 3px rgba(99,102,241,.07); }
+.a-txt textarea:focus { border-color:var(--ac-bdr); background:var(--ac-dim); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent); }
 
 .a-note { }
 .note-lbl {
@@ -391,8 +446,8 @@ body::before {
   cursor:pointer; border:1px solid var(--border); background:rgba(255,255,255,.025);
   color:var(--txt2); transition:all .15s; user-select:none;
 }
-.sm-tag:hover { border-color:rgba(99,102,241,.38); color:#a5b4fc; }
-.sm-tag.sel { background:rgba(99,102,241,.13); border-color:rgba(99,102,241,.42); color:#c7d2fe; font-weight:600; }
+.sm-tag:hover { border-color:var(--ac-bdr); color:var(--accent-lt); }
+.sm-tag.sel { background:var(--ac-dim); border-color:var(--ac-bdr); color:var(--accent-lt); font-weight:600; }
 
 /* ── NAV BAR ── */
 .nav {
@@ -412,11 +467,11 @@ body::before {
 .nav-btn:hover { border-color:var(--border2); color:var(--txt1); }
 .nav-next {
   margin-left:auto;
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#8b5cf6));
   border-color:transparent; color:#fff;
-  box-shadow:0 3px 14px rgba(99,102,241,.35);
+  box-shadow:0 3px 14px var(--ac-glow);
 }
-.nav-next:hover { box-shadow:0 5px 20px rgba(99,102,241,.5); transform:translateY(-1px); }
+.nav-next:hover { box-shadow:0 5px 20px var(--ac-glow2); transform:translateY(-1px); }
 .nav-report {
   margin-left:auto;
   background:linear-gradient(135deg,#059669,#10b981);
@@ -481,10 +536,10 @@ body::before {
 .mbtn svg { width:13px; height:13px; }
 .mbtn-g  { background:var(--card); border:1px solid var(--border); color:var(--txt2); }
 .mbtn-g:hover { border-color:var(--border2); color:var(--txt1); }
-.mbtn-j  { background:rgba(99,102,241,.14); border:1px solid rgba(99,102,241,.28); color:#a5b4fc; }
-.mbtn-j:hover { background:rgba(99,102,241,.22); }
-.mbtn-p  { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 3px 14px rgba(99,102,241,.32); }
-.mbtn-p:hover { box-shadow:0 5px 20px rgba(99,102,241,.5); transform:translateY(-1px); }
+.mbtn-j  { background:var(--ac-dim); border:1px solid var(--ac-bdr); color:var(--accent-lt); }
+.mbtn-j:hover { background:color-mix(in srgb,var(--accent) 22%,transparent); }
+.mbtn-p  { background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#8b5cf6)); color:#fff; box-shadow:0 3px 14px var(--ac-glow); }
+.mbtn-p:hover { box-shadow:0 5px 20px var(--ac-glow2); transform:translateY(-1px); }
 
 /* Report */
 .r-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
@@ -562,6 +617,68 @@ body::before {
 @keyframes tin { from{opacity:0;transform:translateY(6px) scale(.95);} to{opacity:1;transform:translateY(0) scale(1);} }
 .t-ok   { background:rgba(5,150,105,.88); border-color:rgba(52,211,153,.28); color:#fff; box-shadow:0 6px 24px rgba(5,150,105,.28); }
 .t-warn { background:rgba(161,61,5,.88);  border-color:rgba(251,191,36,.28); color:#fff; }
+
+/* ── THEME PANEL ── */
+.tp-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:10px;
+  border:1px solid var(--border); background:var(--card);
+  cursor:pointer; color:var(--txt2); transition:all .18s;
+  flex-shrink:0;
+}
+.tp-btn:hover { border-color:var(--border2); color:var(--txt1); }
+.tp-btn svg { width:17px; height:17px; }
+
+.tp-popup {
+  position:fixed; top:calc(var(--hh) + 8px); right:18px;
+  width:260px; background:var(--modal-bg);
+  border:1px solid var(--border2);
+  border-radius:18px; padding:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  z-index:500; display:none; flex-direction:column; gap:16px;
+  animation:tin .2s cubic-bezier(.34,1.56,.64,1);
+}
+.tp-popup.open { display:flex; }
+
+.tp-section-label {
+  font-size:10px; font-weight:800; color:var(--txt3);
+  letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px;
+}
+
+/* Dark/Light Toggle */
+.tp-mode {
+  display:flex; background:var(--card);
+  border:1px solid var(--border); border-radius:12px; padding:4px; gap:4px;
+}
+.tp-mode-btn {
+  flex:1; padding:8px; border-radius:9px; border:none;
+  cursor:pointer; font-size:13px; font-weight:600;
+  font-family:inherit; transition:all .18s;
+  background:transparent; color:var(--txt3);
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.tp-mode-btn svg { width:14px; height:14px; }
+.tp-mode-btn.active {
+  background:var(--card2); color:var(--txt1);
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+[data-theme="light"] .tp-mode-btn.active { box-shadow:0 2px 8px rgba(0,0,0,.1); }
+
+/* Accent Swatches */
+.tp-swatches { display:flex; gap:8px; flex-wrap:wrap; }
+.tp-swatch {
+  width:36px; height:36px; border-radius:10px;
+  cursor:pointer; border:3px solid transparent;
+  transition:all .18s; position:relative;
+}
+.tp-swatch:hover { transform:scale(1.12); }
+.tp-swatch.active { border-color:var(--txt1); transform:scale(1.08); }
+.tp-swatch.active::after {
+  content:'✓'; position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:900; color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
 
 /* ── ANALİZLERİM DRAWER ── */
 .drawer-ov {
@@ -797,6 +914,23 @@ body::before {
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="20 6 9 17 4 12"/>
   </symbol>
+  <!-- Sun (light mode) -->
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </symbol>
+  <!-- Moon (dark mode) -->
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+  </symbol>
+  <!-- Palette -->
+  <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+  </symbol>
 </svg>
 
 <!-- HEADER -->
@@ -814,6 +948,7 @@ body::before {
     <button class="hbtn" onclick="saveProgress()"><svg><use href="#i-save"/></svg> Kaydet</button>
     <button class="hbtn" onclick="showDrawer()"><svg><use href="#i-folder"/></svg> Analizlerim</button>
     <button class="hbtn prime" onclick="showRpt()"><svg><use href="#i-clip"/></svg> Rapor Oluştur</button>
+    <button class="tp-btn" onclick="toggleThemePanel(event)" title="Tema"><svg><use href="#i-palette"/></svg></button>
   </div>
 </header>
 
@@ -840,6 +975,32 @@ body::before {
   </aside>
 
   <main class="main" id="mainArea"></main>
+</div>
+
+<!-- THEME PANEL -->
+<div class="tp-popup" id="themePanel">
+  <div>
+    <div class="tp-section-label">Görünüm</div>
+    <div class="tp-mode">
+      <button class="tp-mode-btn active" id="btnDark" onclick="setTheme('dark')">
+        <svg><use href="#i-moon"/></svg> Koyu
+      </button>
+      <button class="tp-mode-btn" id="btnLight" onclick="setTheme('light')">
+        <svg><use href="#i-sun"/></svg> Açık
+      </button>
+    </div>
+  </div>
+  <div>
+    <div class="tp-section-label">Renk Teması</div>
+    <div class="tp-swatches">
+      <div class="tp-swatch active" data-accent="indigo"  style="background:linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="setAccent('indigo',this)"  title="İndigo"></div>
+      <div class="tp-swatch"        data-accent="violet"  style="background:linear-gradient(135deg,#7c3aed,#a78bfa)" onclick="setAccent('violet',this)"  title="Mor"></div>
+      <div class="tp-swatch"        data-accent="cyan"    style="background:linear-gradient(135deg,#0891b2,#22d3ee)" onclick="setAccent('cyan',this)"    title="Cyan"></div>
+      <div class="tp-swatch"        data-accent="emerald" style="background:linear-gradient(135deg,#059669,#34d399)" onclick="setAccent('emerald',this)" title="Yeşil"></div>
+      <div class="tp-swatch"        data-accent="rose"    style="background:linear-gradient(135deg,#e11d48,#fb7185)" onclick="setAccent('rose',this)"    title="Kırmızı"></div>
+      <div class="tp-swatch"        data-accent="amber"   style="background:linear-gradient(135deg,#d97706,#fbbf24)" onclick="setAccent('amber',this)"   title="Turuncu"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ANALİZLERİM DRAWER -->
@@ -1109,7 +1270,7 @@ let curId = null, answers = {}, modSt = {};
 // ── INIT ───────────────────────────────────────────────────
 function init() {
   document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
-  buildSB(); renderWelcome();
+  buildSB(); renderWelcome(); loadThemePrefs();
 }
 function onCI() {
   const v = document.getElementById('customerName').value;
@@ -1442,6 +1603,42 @@ function renderDrawer() {
       </div>`;
   }).join('');
 }
+// ── THEME SYSTEM ───────────────────────────────────────────
+function toggleThemePanel(e) {
+  e.stopPropagation();
+  document.getElementById('themePanel').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const p = document.getElementById('themePanel');
+  if (p && !p.contains(e.target)) p.classList.remove('open');
+});
+
+function setTheme(mode) {
+  document.documentElement.dataset.theme = mode;
+  document.getElementById('btnDark').classList.toggle('active', mode === 'dark');
+  document.getElementById('btnLight').classList.toggle('active', mode === 'light');
+  localStorage.setItem('erp_theme', mode);
+}
+
+function setAccent(name, el) {
+  document.documentElement.dataset.accent = name;
+  document.querySelectorAll('.tp-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  localStorage.setItem('erp_accent', name);
+}
+
+function loadThemePrefs() {
+  const theme  = localStorage.getItem('erp_theme')  || 'dark';
+  const accent = localStorage.getItem('erp_accent') || 'indigo';
+  document.documentElement.dataset.theme  = theme;
+  document.documentElement.dataset.accent = accent;
+  document.getElementById('btnDark').classList.toggle('active',  theme === 'dark');
+  document.getElementById('btnLight').classList.toggle('active', theme === 'light');
+  document.querySelectorAll('.tp-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.accent === accent);
+  });
+}
+
 function toast(msg,type='ok') {
   const t=document.createElement('div');
   t.className=`toast t-${type}`;
