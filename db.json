@@ -1,0 +1,15 @@
+{
+  "analyses": [
+    {
+      "customer": "Test Firma A.Ş.",
+      "analyst": "Onur Ağca",
+      "date": "2026-03-16",
+      "savedAt": 1773694373114,
+      "activeCount": 0,
+      "partialCount": 0,
+      "answers": {},
+      "modSt": {},
+      "id": 1
+    }
+  ]
+}

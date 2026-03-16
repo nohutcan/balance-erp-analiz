@@ -1519,77 +1519,75 @@ function restore(id) {
   if(genNotEl && answers[`${id}_genel_not`]) genNotEl.value = answers[`${id}_genel_not`];
 }
 
+// ── API CONFIG ──────────────────────────────────────────────
+const API = 'http://localhost:3001';
+let currentAnalysisId = null; // json-server'daki kayıt ID'si
+
+async function apiReq(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (method === 'DELETE') return;
+  return res.json();
+}
+
 // ── SAVE / LOAD ────────────────────────────────────────────
-const IDX_KEY = 'erp_index_v1';
-
-function getIndex() {
-  try { return JSON.parse(localStorage.getItem(IDX_KEY)) || []; } catch { return []; }
-}
-function setIndex(arr) {
-  localStorage.setItem(IDX_KEY, JSON.stringify(arr));
-}
-
-function saveProgress() {
+async function saveProgress() {
   const customer = document.getElementById('customerName').value.trim();
   const analyst  = document.getElementById('analystName').value.trim();
   const date     = document.getElementById('analysisDate').value;
   if (!customer) { toast('Müşteri adı girin', 'warn'); return; }
 
-  const idx = getIndex();
-  // Aynı müşteri varsa güncelle, yoksa yeni ekle
-  let entry = idx.find(e => e.customer === customer);
-  const key = entry ? entry.key : 'erp_a_' + Date.now();
-  const now = Date.now();
-
-  if (!entry) {
-    entry = { key, customer, analyst, date, savedAt: now };
-    idx.unshift(entry);
-  } else {
-    entry.analyst = analyst;
-    entry.date    = date;
-    entry.savedAt = now;
-    // Başa taşı
-    const i = idx.indexOf(entry);
-    if (i > 0) { idx.splice(i, 1); idx.unshift(entry); }
-  }
-
   const activeCount  = MODULES.filter(m => modSt[m.id] === 'yes').length;
   const partialCount = MODULES.filter(m => modSt[m.id] === 'partial').length;
-  entry.activeCount  = activeCount;
-  entry.partialCount = partialCount;
+  const payload = { customer, analyst, date, savedAt: Date.now(), activeCount, partialCount, answers, modSt };
 
-  setIndex(idx);
-  localStorage.setItem(key, JSON.stringify({ customer, analyst, date, answers, modSt, savedAt: now }));
-  toast('Kaydedildi ✓', 'ok');
+  try {
+    if (currentAnalysisId) {
+      await apiReq(`/analyses/${currentAnalysisId}`, 'PUT', payload);
+    } else {
+      const created = await apiReq('/analyses', 'POST', payload);
+      currentAnalysisId = created.id;
+    }
+    toast('Kaydedildi ✓', 'ok');
+  } catch (err) {
+    toast('⚠️ Veritabanı başlatılmamış! Terminal\'de: npm run db', 'warn');
+  }
 }
 
-function loadAnalysis(key) {
-  const d = localStorage.getItem(key);
-  if (!d) { toast('Kayıt bulunamadı', 'warn'); return; }
-  const p = JSON.parse(d);
-  document.getElementById('customerName').value = p.customer || '';
-  document.getElementById('analystName').value  = p.analyst  || '';
-  document.getElementById('analysisDate').value = p.date     || '';
-  answers = p.answers || {}; modSt = p.modSt || {};
-  onCI(); buildSB();
-  if (curId) renderMod(curId); else renderWelcome();
-  closeDrawer();
-  toast('Analiz yüklendi', 'ok');
+async function loadAnalysis(id) {
+  try {
+    const p = await apiReq(`/analyses/${id}`);
+    currentAnalysisId = p.id;
+    document.getElementById('customerName').value = p.customer || '';
+    document.getElementById('analystName').value  = p.analyst  || '';
+    document.getElementById('analysisDate').value = p.date     || '';
+    answers = p.answers || {}; modSt = p.modSt || {};
+    onCI(); buildSB();
+    if (curId) renderMod(curId); else renderWelcome();
+    closeDrawer();
+    toast('Analiz yüklendi', 'ok');
+  } catch (err) {
+    toast('Kayıt yüklenemedi', 'warn');
+  }
 }
 
-function deleteAnalysis(key, e) {
+async function deleteAnalysis(id, e) {
   e.stopPropagation();
   if (!confirm('Bu analizi silmek istediğinize emin misiniz?')) return;
-  const idx = getIndex().filter(e => e.key !== key);
-  setIndex(idx);
-  localStorage.removeItem(key);
-  renderDrawer();
-  toast('Silindi', 'ok');
+  try {
+    await apiReq(`/analyses/${id}`, 'DELETE');
+    if (currentAnalysisId === id) currentAnalysisId = null;
+    renderDrawer();
+    toast('Silindi', 'ok');
+  } catch (err) {
+    toast('Silinemedi', 'warn');
+  }
 }
 
 function newAnalysis() {
   if (!confirm('Mevcut analizi kapatıp yeni başlamak istiyor musunuz?')) return;
-  answers = {}; modSt = {};
+  answers = {}; modSt = {}; currentAnalysisId = null;
   document.getElementById('customerName').value = '';
   document.getElementById('analystName').value  = '';
   document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
@@ -1597,7 +1595,7 @@ function newAnalysis() {
   closeDrawer();
 }
 
-// Eski tek-kayıt yedek (geriye dönük uyumluluk)
+// Geriye dönük uyumluluk
 function loadProgress() { showDrawer(); }
 
 // ── DRAWER ─────────────────────────────────────────────────
@@ -1610,13 +1608,26 @@ function closeDrawer(e) {
   document.getElementById('drawerOv').classList.remove('open');
 }
 
-function renderDrawer() {
-  const idx = getIndex();
+async function renderDrawer() {
   const drCount = document.getElementById('drCount');
   const drList  = document.getElementById('drList');
-  drCount.textContent = idx.length
-    ? `${idx.length} kayıtlı analiz`
-    : 'Henüz kayıt yok';
+  drList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--txt3)">⏳ Yükleniyor...</div>';
+
+  let idx = [];
+  try {
+    idx = await apiReq('/analyses');
+    idx.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+  } catch (err) {
+    drList.innerHTML = `
+      <div class="dr-empty">
+        <div class="dr-empty-ico">⚠️</div>
+        <p>Veritabanı sunucusu çalışmıyor.<br>Terminal'de şu komutu çalıştırın:<br><strong style="color:var(--accent);font-family:monospace">npm run db</strong></p>
+      </div>`;
+    drCount.textContent = 'Bağlantı hatası';
+    return;
+  }
+
+  drCount.textContent = idx.length ? `${idx.length} kayıtlı analiz` : 'Henüz kayıt yok';
 
   if (!idx.length) {
     drList.innerHTML = `
@@ -1650,10 +1661,10 @@ function renderDrawer() {
           <div class="dr-stat"><div class="dr-stat-n" style="color:var(--txt3)">${no}</div><div class="dr-stat-l">Belirsiz/Hayır</div></div>
         </div>
         <div class="dr-card-btns">
-          <button class="dr-btn-load" onclick="loadAnalysis('${entry.key}')">
+          <button class="dr-btn-load" onclick="loadAnalysis(${entry.id})">
             <svg><use href="#i-folder"/></svg> Yükle
           </button>
-          <button class="dr-btn-del" onclick="deleteAnalysis('${entry.key}', event)" title="Sil">
+          <button class="dr-btn-del" onclick="deleteAnalysis(${entry.id}, event)" title="Sil">
             <svg><use href="#i-x"/></svg>
           </button>
         </div>

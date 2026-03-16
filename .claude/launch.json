@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-p", "5500", "."],
       "port": 5500
+    },
+    {
+      "name": "ERP Database (json-server)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["json-server", "--watch", "db.json", "--port", "3001"],
+      "port": 3001
     }
   ]
 }
