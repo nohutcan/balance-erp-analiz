@@ -1374,6 +1374,24 @@ function renderMod(id) {
     h += `</div></div></div>`;
   }
 
+  // Modül genel notlar kartı
+  const notKey = `${id}_genel_not`;
+  h += `<div class="qg">
+    <div class="qg-hdr">
+      <span class="qg-badge" style="background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.28);">NOTLAR</span>
+      <span class="qg-title">${m.name} – Genel Notlar</span>
+      <span class="qg-desc">Özel gereksinimler, ek bilgiler</span>
+    </div>
+    <div class="qi">
+      <div class="a-note">
+        <div class="note-lbl"><svg><use href="#i-pen"/></svg> Notlar &amp; Özel Gereksinimler</div>
+        <textarea id="${notKey}" rows="4"
+          placeholder="${m.name} modülüne ait özel gereksinimler, müşteri notları, dikkat edilmesi gereken konular..."
+          oninput="answers['${notKey}']=this.value"></textarea>
+      </div>
+    </div>
+  </div>`;
+
   h += `<div class="nav">
     ${idx>0?`<button class="nav-btn" onclick="sel('${MODULES[idx-1].id}')"><svg><use href="#i-left"/></svg> Önceki</button>`:'<span></span>'}
     <span class="nav-info">Modül ${idx+1} / ${MODULES.length}</span>
@@ -1460,6 +1478,9 @@ function restore(id) {
       if(t.textContent.trim()===sm)t.classList.toggle('sel',answers[key]==='1');
     });
   });
+  // Modül genel not alanını yükle
+  const genNotEl = document.getElementById(`${id}_genel_not`);
+  if(genNotEl && answers[`${id}_genel_not`]) genNotEl.value = answers[`${id}_genel_not`];
 }
 
 // ── SAVE / LOAD ────────────────────────────────────────────
