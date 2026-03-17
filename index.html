@@ -1326,10 +1326,20 @@ function buildSB() {
     </div>`;
   });
   document.getElementById('sbList').innerHTML = h;
-  const done = MODULES.filter(m=>modSt[m.id]&&modSt[m.id]!=='').length;
-  const pct = Math.round(done/MODULES.length*100);
-  document.getElementById('progPct').textContent = pct+'%';
-  document.getElementById('progFill').style.width = pct+'%';
+
+  // Modülde herhangi bir soru yanıtlanmış mı?
+  function modHasAnswers(id) {
+    const groups = QUESTIONS[id] || [];
+    return groups.some(g => g.qs.some(q => {
+      const v = answers[q.id];
+      return v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0);
+    }));
+  }
+
+  const done = MODULES.filter(m => (modSt[m.id] && modSt[m.id] !== '') || modHasAnswers(m.id)).length;
+  const pct = Math.round(done / MODULES.length * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
 }
 
 // ── WELCOME ────────────────────────────────────────────────
@@ -1421,7 +1431,7 @@ function renderMod(id) {
         <div class="note-lbl"><svg><use href="#i-pen"/></svg> Notlar &amp; Özel Gereksinimler</div>
         <textarea id="${notKey}" rows="4"
           placeholder="${m.name} modülüne ait özel gereksinimler, müşteri notları, dikkat edilmesi gereken konular..."
-          oninput="answers['${notKey}']=this.value"></textarea>
+          oninput="answers['${notKey}']=this.value;buildSB()"></textarea>
       </div>
     </div>
   </div>`;
@@ -1454,11 +1464,11 @@ function renderQ(q) {
   } else if (q.type==='mc') {
     b=`<div class="a-opts">`+q.opts.map(o=>`<button class="opt" id="mc_${id}_${s(o)}" onclick="tMC('${id}','${o.replace(/'/g,"\\'")}','${s(o)}')">${o}</button>`).join('')+`</div>`;
   } else if (q.type==='number') {
-    b=`<div class="a-num"><input class="num-in" type="number" id="n_${id}" min="0" placeholder="0" oninput="answers['${id}']=this.value">${q.unit?`<span class="num-unit">${q.unit}</span>`:''}</div>`;
+    b=`<div class="a-num"><input class="num-in" type="number" id="n_${id}" min="0" placeholder="0" oninput="answers['${id}']=this.value;buildSB()">${q.unit?`<span class="num-unit">${q.unit}</span>`:''}</div>`;
   } else if (q.type==='txt') {
-    b=`<div class="a-txt"><textarea id="t_${id}" placeholder="${q.ph||''}" oninput="answers['${id}']=this.value"></textarea></div>`;
+    b=`<div class="a-txt"><textarea id="t_${id}" placeholder="${q.ph||''}" oninput="answers['${id}']=this.value;buildSB()"></textarea></div>`;
   } else if (q.type==='note') {
-    b=`<div class="a-note"><div class="note-lbl"><svg><use href="#i-pen"/></svg> Not / Özel Gereksinim</div><textarea id="no_${id}" placeholder="${q.ph||'Notlarınızı buraya girin...'}" oninput="answers['${id}']=this.value"></textarea></div>`;
+    b=`<div class="a-note"><div class="note-lbl"><svg><use href="#i-pen"/></svg> Not / Özel Gereksinim</div><textarea id="no_${id}" placeholder="${q.ph||'Notlarınızı buraya girin...'}" oninput="answers['${id}']=this.value;buildSB()"></textarea></div>`;
   }
   return `<div class="qi"><div class="qi-q">${q.req?'<span class="qi-req">*</span>':''}${q.t}</div>${b}</div>`;
 }
@@ -1473,23 +1483,27 @@ function setYN(id,v) {
     const map={y:'yes',p:'partial',n:'no'};
     el.className='yn'+(map[k]===v?' '+k:'');
   });
+  buildSB();
 }
 function setOp(id,v,safe) {
   answers[id]=v;
   document.querySelectorAll(`[id^="op_${id}_"]`).forEach(b=>b.classList.remove('sel'));
   document.getElementById(`op_${id}_${safe}`)?.classList.add('sel');
+  buildSB();
 }
 function tMC(id,v,safe) {
   if(!Array.isArray(answers[id]))answers[id]=[];
   const i=answers[id].indexOf(v);
   i>=0?answers[id].splice(i,1):answers[id].push(v);
   document.getElementById(`mc_${id}_${safe}`)?.classList.toggle('sel',answers[id].includes(v));
+  buildSB();
 }
 function tSm(modId,name,key) {
   answers[key]=answers[key]==='1'?'':'1';
   document.getElementById(`smg_${modId}`)?.querySelectorAll('.sm-tag').forEach(t=>{
     if(t.textContent.trim()===name) t.classList.toggle('sel',answers[key]==='1');
   });
+  buildSB();
 }
 function setSt(id,v) { modSt[id]=v; buildSB(); renderMod(id); }
 
