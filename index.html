@@ -607,6 +607,7 @@ body::before {
 .r-det-h-ico svg { width:14px; height:14px; }
 .r-det-title { font-size:15px; font-weight:800; color:var(--txt1); flex:1; }
 .r-body { padding:10px 16px; display:flex; flex-direction:column; gap:5px; }
+.r-group-title { font-size:11px; font-weight:700; color:var(--txt3); letter-spacing:1.2px; text-transform:uppercase; padding:10px 0 4px; border-bottom:1px solid var(--border); margin-top:4px; }
 .r-row {
   display:flex; align-items:flex-start; gap:9px;
   padding:6px 9px; background:rgba(255,255,255,.018);
@@ -1310,6 +1311,18 @@ function onCI() {
   document.getElementById('hTitle').textContent = v ? `${v} · ERP Proje Analizi` : 'Müşteri Proje Analiz ve Gereksinim Yönetimi';
 }
 
+// ── HELPERS ────────────────────────────────────────────────
+// Modülde herhangi bir soru yanıtlanmış mı? (global – rapor ve sidebar paylaşır)
+function modHasAnswers(id) {
+  const groups = QUESTIONS[id] || [];
+  return groups.some(g => g.qs.some(q => {
+    const v = answers[q.id];
+    return v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0);
+  }));
+}
+// yes/partial/no → Türkçe etiket
+const TR = { yes:'Evet', partial:'Kısmen', no:'Hayır' };
+
 // ── SIDEBAR ────────────────────────────────────────────────
 function buildSB() {
   let h = '';
@@ -1317,6 +1330,7 @@ function buildSB() {
     const s = modSt[m.id]||'';
     let dc='d-e', dt='○';
     if(s==='yes'){dc='d-y';dt='✓';} else if(s==='partial'){dc='d-p';dt='~';} else if(s==='no'){dc='d-n';dt='✗';}
+    else if(modHasAnswers(m.id)){dc='d-p';dt='~';} // yanıt var ama durum seçilmemiş
     h += `<div class="mod-row ${curId===m.id?'on':''}" onclick="sel('${m.id}')">
       <div class="mod-ico" style="background:${m.bg};color:${m.color};">
         <svg style="width:15px;height:15px;"><use href="#${m.icon}"/></svg>
@@ -1326,16 +1340,6 @@ function buildSB() {
     </div>`;
   });
   document.getElementById('sbList').innerHTML = h;
-
-  // Modülde herhangi bir soru yanıtlanmış mı?
-  function modHasAnswers(id) {
-    const groups = QUESTIONS[id] || [];
-    return groups.some(g => g.qs.some(q => {
-      const v = answers[q.id];
-      return v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0);
-    }));
-  }
-
   const done = MODULES.filter(m => (modSt[m.id] && modSt[m.id] !== '') || modHasAnswers(m.id)).length;
   const pct = Math.round(done / MODULES.length * 100);
   document.getElementById('progPct').textContent = pct + '%';
@@ -1739,9 +1743,10 @@ function showRpt() {
   const cust=document.getElementById('customerName').value||'—';
   const anal=document.getElementById('analystName').value||'—';
   const date=document.getElementById('analysisDate').value||'—';
-  const active=MODULES.filter(m=>['yes','partial'].includes(modSt[m.id]||''));
-  const inact =MODULES.filter(m=>modSt[m.id]==='no');
-  const pend  =MODULES.filter(m=>!modSt[m.id]);
+  // Aktif: modSt set edilmiş VEYA soruları yanıtlanmış modüller
+  const active=MODULES.filter(m=>['yes','partial'].includes(modSt[m.id]||'') || modHasAnswers(m.id));
+  const inact =MODULES.filter(m=>modSt[m.id]==='no' && !modHasAnswers(m.id));
+  const pend  =MODULES.filter(m=>!modSt[m.id] && !modHasAnswers(m.id));
 
   let h=`
     <div class="r-meta">
@@ -1758,13 +1763,15 @@ function showRpt() {
 
   MODULES.forEach(m=>{
     const st=modSt[m.id]||'';
-    const lb={yes:'Kullanılacak',partial:'Kısmen',no:'Kapsam Dışı','':'Belirsiz'}[st];
-    h+=`<div class="r-mc2 s-${st||'n'}">
+    const hasAns = modHasAnswers(m.id);
+    const effSt = st || (hasAns ? 'partial' : '');
+    const lb={yes:'Kullanılacak',partial:'Kısmen',no:'Kapsam Dışı','':'Belirsiz'}[effSt]||'Belirsiz';
+    h+=`<div class="r-mc2 s-${effSt||'n'}">
       <div class="r-mc2-ico" style="background:${m.bg};color:${m.color};">
         <svg style="width:15px;height:15px;"><use href="#${m.icon}"/></svg>
       </div>
       <div class="r-mc2-info"><h5>${m.name}</h5><p>${m.desc}</p></div>
-      <span class="rbadge rb-${st||'n'}">${lb}</span>
+      <span class="rbadge rb-${effSt||'n'}">${lb}</span>
     </div>`;
   });
   h+=`</div></div>`;
@@ -1772,22 +1779,39 @@ function showRpt() {
   if(active.length){
     h+=`<div class="r-sec"><div class="r-sec-t">Modül Detayları</div>`;
     active.forEach(m=>{
-      const st=modSt[m.id];
+      const st=modSt[m.id]||'partial';
+      const stLbl={yes:'Kullanılacak',partial:'Kısmen',no:'Kapsam Dışı'}[st]||'Kısmen';
       h+=`<div class="r-det">
         <div class="r-det-h" style="border-left:3px solid ${m.color}">
           <div class="r-det-h-ico" style="background:${m.bg};color:${m.color};"><svg><use href="#${m.icon}"/></svg></div>
           <span class="r-det-title">${m.name}</span>
-          <span class="rbadge rb-${st}">${st==='yes'?'Kullanılacak':'Kısmen'}</span>
+          <span class="rbadge rb-${st}">${stLbl}</span>
         </div>
         <div class="r-body">`;
-      (QUESTIONS[m.id]||[]).forEach(g=>g.qs.forEach(q=>{
-        const v=answers[q.id]; if(!v&&v!==0)return;
-        const dv=Array.isArray(v)?v.join(', '):String(v); if(!dv)return;
-        if(q.type==='note') h+=`<div class="r-note">Not: ${dv}</div>`;
-        else h+=`<div class="r-row"><span class="r-q">${q.t.replace(/\?$/,'')}</span><span class="r-a">${dv}</span></div>`;
-      }));
+      (QUESTIONS[m.id]||[]).forEach(g=>{
+        let groupHasContent = false;
+        let groupHtml = '';
+        g.qs.forEach(q=>{
+          const v=answers[q.id]; if(v===undefined||v===null||v==='')return;
+          if(Array.isArray(v)&&v.length===0)return;
+          // yes/partial/no → Türkçe
+          const raw=Array.isArray(v)?v.map(x=>TR[x]||x).join(', '):(TR[v]||String(v));
+          if(!raw)return;
+          groupHasContent=true;
+          if(q.type==='note'||q.type==='txt')
+            groupHtml+=`<div class="r-note"><strong>${q.t.replace(/\?$/,'')}: </strong>${raw}</div>`;
+          else
+            groupHtml+=`<div class="r-row"><span class="r-q">${q.t.replace(/\?$/,'')}</span><span class="r-a">${raw}</span></div>`;
+        });
+        if(groupHasContent){
+          h+=`<div class="r-group-title">${g.title}</div>${groupHtml}`;
+        }
+      });
       const selSubs=(SUBMODULES[m.id]||[]).filter(sm=>answers[`sm_${m.id}_${sm.replace(/\W+/g,'_')}`]==='1');
       if(selSubs.length) h+=`<div class="r-row"><span class="r-q">Kullanılacak alt modüller</span><span class="r-a">${selSubs.join(' · ')}</span></div>`;
+      // Modül genel notu
+      const genNot = answers[`${m.id}_genel_not`];
+      if(genNot) h+=`<div class="r-note"><strong>Genel Not:</strong> ${genNot}</div>`;
       h+=`</div></div>`;
     });
     h+=`</div>`;
